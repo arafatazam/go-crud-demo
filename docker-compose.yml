@@ -8,6 +8,8 @@ services:
         environment:
             POSTGRES_PASSWORD: demo
             POSTGRES_USER: demo
+        ports:
+            - 5432:5432
 
     adminer:
         image: adminer
