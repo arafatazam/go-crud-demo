@@ -19,9 +19,7 @@ func SetHandlers(app *fiber.App, usrSvc *UserService, validate *validator.Valida
 		if err := validate.Struct(u); err!=nil {
 		  log.Panic(err)
 		}
-		if err := usrSvc.CreateUser(u); err!=nil {
-		  log.Panic(err)
-		}
+		usrSvc.CreateUser(u)
 		if err := c.JSON(&u); err != nil {
 		  log.Panic(err)
 		}
