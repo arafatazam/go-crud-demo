@@ -10,6 +10,16 @@ import (
 func SetHandlers(app *fiber.App, usrSvc *UserService, validate *validator.Validate)  {
 	users := app.Group("/users")
 	
+	users.Get("/", func (c *fiber.Ctx) {
+		list, err := usrSvc.ListUsers()
+		if err != nil {
+			log.Panic(err)
+		}
+		if err:=c.JSON(&list); err!=nil {
+			log.Panic(err)
+		}
+	})
+
 	users.Post("/", func (c *fiber.Ctx) {
 		c.Accepts("application/json")
 		u := new(User)
