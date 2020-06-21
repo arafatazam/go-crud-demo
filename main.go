@@ -8,6 +8,7 @@ import (
   _ "github.com/lib/pq"
   "github.com/jmoiron/sqlx"
   "github.com/gofiber/fiber"
+  "github.com/gofiber/fiber/middleware"
   "github.com/go-playground/validator/v10"
 )
 
@@ -22,30 +23,18 @@ func main() {
 
   err = db.Ping()
   if err != nil {
-	  log.Panic("Database Connection Failure")
+	  log.Fatal("Database Connection Failure")
   }
-  usrSvs := UserService{
+  usrSvc := &UserService{
     DB: *db,
   }
   validate := validator.New()
 
   app := fiber.New()
+  app.Use(middleware.Recover())
+  app.Use(middleware.Logger())
 
-  app.Post("/users", func (c *fiber.Ctx) {
-    c.Accepts("application/json")
-    u := new(User)
-    if err := c.BodyParser(u); err != nil {
-      log.Fatal(err)
-    }
-    err := validate.Struct(u)
-    if err!=nil {
-      log.Panic(err)
-    }
-    usrSvs.CreateUser(u)
-    if err := c.JSON(&u); err != nil {
-      c.Next(err)
-    }
-  })
+  SetHandlers(app, usrSvc, validate)
   
   app.Listen(os.Getenv("PORT"))
 }
