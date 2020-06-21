@@ -32,3 +32,15 @@ func (svc UserService) GetUser(id string) (User, error){
 	}
 	return u, nil
 }
+
+func (svc UserService) UpdateUser(id string, u *User) {
+	update := svc.DB.Rebind(`UPDATE "users" SET "email" = ?, "first_name" = ?, "last_name" = ?,
+				"address" = ?, "phone" = ? WHERE "id" = ?`)
+	svc.DB.MustExec(update, u.Email, u.FirstName, u.LastName, u.Address, u.Phone, id)
+	u.Id = id
+}
+
+func (svc UserService) DeleteUser(id string) {
+	update := svc.DB.Rebind(`DELETE FROM "users" WHERE (("id" = ?))`)
+	svc.DB.MustExec(update, id)
+}

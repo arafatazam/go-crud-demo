@@ -23,14 +23,14 @@ func SetHandlers(app *fiber.App, usrSvc *UserService, validate *validator.Valida
 
 	users.Post("/", func (c *fiber.Ctx) {
 		c.Accepts("application/json")
-		u := new(User)
-		if err := c.BodyParser(u); err != nil {
+		u := User{}
+		if err := c.BodyParser(&u); err != nil {
 		  log.Panic(err)
 		}
 		if err := validate.Struct(u); err!=nil {
 		  log.Panic(err)
 		}
-		usrSvc.CreateUser(u)
+		usrSvc.CreateUser(&u)
 		if err := c.JSON(&u); err != nil {
 		  log.Panic(err)
 		}
@@ -46,5 +46,33 @@ func SetHandlers(app *fiber.App, usrSvc *UserService, validate *validator.Valida
 			log.Panic(err)
 		}
 		c.JSON(&u)
+	})
+
+	users.Put("/:id", func(c *fiber.Ctx){
+		c.Accepts("application/json")
+		id := c.Params("id")
+		if _, err:= uuid.Parse(id); err!=nil{
+			c.Next(fiber.NewError(400, "The given uuid cannot be parsed."))
+			return
+		}
+		u := User{}
+		if err := c.BodyParser(&u); err != nil {
+		  log.Panic(err)
+		}
+		if err := validate.Struct(u); err!=nil {
+		  log.Panic(err)
+		}
+		usrSvc.UpdateUser(id, &u)
+		c.JSON(&u)
+	})
+
+	users.Delete("/:id", func(c *fiber.Ctx){
+		id := c.Params("id")
+		if _, err:= uuid.Parse(id); err!=nil{
+			c.Next(fiber.NewError(400, "The given uuid cannot be parsed."))
+			return
+		}
+		usrSvc.DeleteUser(id)
+		c.Send("Deleted")
 	})
 }
