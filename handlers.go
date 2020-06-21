@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/google/uuid"
 	"github.com/gofiber/fiber"
 	"github.com/go-playground/validator/v10"
 )
@@ -34,4 +35,16 @@ func SetHandlers(app *fiber.App, usrSvc *UserService, validate *validator.Valida
 		  log.Panic(err)
 		}
 	  })
+
+	users.Get("/:id", func(c *fiber.Ctx){
+		id := c.Params("id")
+		if _, err:= uuid.Parse(id); err!=nil{
+			log.Panic("Invalid UUID")
+		}
+		u, err := usrSvc.GetUser(id)
+		if err!=nil {
+			log.Panic(err)
+		}
+		c.JSON(&u)
+	})
 }

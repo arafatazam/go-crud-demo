@@ -24,3 +24,11 @@ func (svc UserService) CreateUser(user *User) {
 	svc.DB.MustExec(createUser, user.Id, user.Email, user.FirstName, 
 		user.LastName, user.Address, user.Phone)
 }
+
+func (svc UserService) GetUser(id string) (User, error){
+	u := User{}
+	if err:= svc.DB.Get(&u, svc.DB.Rebind(`SELECT * FROM "users" WHERE "id" = ? LIMIT 1`), id); err!=nil {
+		return u, err
+	}
+	return u, nil
+}
